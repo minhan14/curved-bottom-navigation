@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="cbn_selectedColor">#FFFFFF</color>
+    <color name="cbn_unSelectedColor">#B0B0B0</color>
+    <color name="cbn_fabBg">#333333</color>
+    <color name="cbn_bg">#333333</color>
+    <color name="cbn_shadow">#40000000</color>
+</resources>

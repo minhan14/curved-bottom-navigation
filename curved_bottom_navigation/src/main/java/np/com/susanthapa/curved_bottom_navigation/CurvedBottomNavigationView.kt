@@ -2,6 +2,7 @@ package np.com.susanthapa.curved_bottom_navigation
 
 import android.animation.*
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
@@ -220,7 +221,7 @@ class CurvedBottomNavigationView @JvmOverloads constructor(
                 navElevation,
                 0f,
                 6f,
-                shadowColor
+                ResourcesCompat.getColor(resources, R.color.cbn_shadow, context.theme)
             )
         }
 
@@ -231,7 +232,7 @@ class CurvedBottomNavigationView @JvmOverloads constructor(
                 fabElevation,
                 0f,
                 6f,
-                shadowColor
+                ResourcesCompat.getColor(resources, R.color.cbn_shadow, context.theme)
             )
         }
 
@@ -241,11 +242,19 @@ class CurvedBottomNavigationView @JvmOverloads constructor(
                 try {
                     selectedColor = getColor(
                         R.styleable.CurvedBottomNavigationView_cbn_selectedColor,
-                        selectedColor
+                        ResourcesCompat.getColor(
+                            resources,
+                            R.color.cbn_selectedColor,
+                            context.theme
+                        )
                     )
                     unSelectedColor = getColor(
                         R.styleable.CurvedBottomNavigationView_cbn_unSelectedColor,
-                        unSelectedColor
+                        ResourcesCompat.getColor(
+                            resources,
+                            R.color.cbn_unSelectedColor,
+                            context.theme
+                        )
                     )
                     animDuration = getInteger(
                         R.styleable.CurvedBottomNavigationView_cbn_animDuration,
@@ -253,10 +262,12 @@ class CurvedBottomNavigationView @JvmOverloads constructor(
                     ).toLong()
                     fabBackgroundColor = getColor(
                         R.styleable.CurvedBottomNavigationView_cbn_fabBg,
-                        fabBackgroundColor
+                        ResourcesCompat.getColor(resources, R.color.cbn_fabBg, context.theme)
                     )
-                    navBackgroundColor =
-                        getColor(R.styleable.CurvedBottomNavigationView_cbn_bg, navBackgroundColor)
+                    navBackgroundColor = getColor(
+                        R.styleable.CurvedBottomNavigationView_cbn_bg,
+                        ResourcesCompat.getColor(resources, R.color.cbn_bg, context.theme)
+                    )
                     fabElevation = getDimension(
                         R.styleable.CurvedBottomNavigationView_cbn_fabElevation,
                         fabElevation
@@ -534,6 +545,36 @@ class CurvedBottomNavigationView @JvmOverloads constructor(
         animatorSet.start()
     }
 
+    private fun updateColors() {
+        selectedColor =
+            ResourcesCompat.getColor(resources, R.color.cbn_selectedColor, context.theme)
+        unSelectedColor =
+            ResourcesCompat.getColor(resources, R.color.cbn_unSelectedColor, context.theme)
+        fabBackgroundColor = ResourcesCompat.getColor(resources, R.color.cbn_fabBg, context.theme)
+        navBackgroundColor = ResourcesCompat.getColor(resources, R.color.cbn_bg, context.theme)
+        val shadowColor = ResourcesCompat.getColor(resources, R.color.cbn_shadow, context.theme)
+
+        navPaint.apply {
+            color = navBackgroundColor
+            setShadowLayer(navElevation, 0f, 6f, shadowColor)
+        }
+
+        fabPaint.apply {
+            color = fabBackgroundColor
+            setShadowLayer(fabElevation, 0f, 6f, shadowColor)
+        }
+
+        updateMenuAVDsTint()
+        updateMenuIconsTint()
+        invalidate()
+    }
+
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        updateColors()
+    }
+
     private fun getBezierCurveAnimation(
         slideAnimDuration: Long,
         width: Int,
@@ -602,6 +643,7 @@ class CurvedBottomNavigationView @JvmOverloads constructor(
                             )
                         }
                     }
+
                     abs(overIconIndex - prevSelectedIndex) == 1 -> {
                         // we currently in the adjacent icon of the current source icon, show source animations
                         bottomNavItemViews[prevSelectedIndex].startSourceAnimation(slideAnimDuration)
@@ -611,6 +653,7 @@ class CurvedBottomNavigationView @JvmOverloads constructor(
                             curveBottomOffset
                         )
                     }
+
                     else -> {
                         // we over intermediate icons, show the intermediate animations
                         bottomNavItemViews[overIconIndex].startIntermediateAnimation(
